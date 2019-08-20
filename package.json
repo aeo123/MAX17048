@@ -1,7 +1,7 @@
 {
   "name": "MAX17048",
-  "description": "MAX17048",
-  "description_zh": "MAX17048",  
+  "description": "bat monitor: MAX17048",
+  "description_zh": "电池监测：MAX17048",  
   "keywords": [
     "MAX17048"
   ],
@@ -10,15 +10,15 @@
     "name": "zpw",
     "email": "aeo1234@qq.com"
   },
-  "license": "GPL-2.0",
-  "repository": "https://gitee.com/aeo123/ledblink.git",
+  "license": "MIT",
+  "repository": "https://github.com/aeo123/MAX17048.git",
   "icon": "unknown",
-  "homepage": "https://gitee.com/aeo123/ledblink/tree/master",
-  "doc": "https://gitee.com/aeo123/ledblink/blob/master/readme.md",
+  "homepage": "https://github.com/aeo123/MAX17048.git",
+  "doc": "https://github.com/aeo123/MAX17048.git",
   "site": [
     {
       "version": "latest",
-      "URL": "https://gitee.com/aeo123/ledblink.git",
+      "URL": "https://github.com/aeo123/MAX17048.git",
       "filename": "Null for git package",
       "VER_SHA": "master"
     }
