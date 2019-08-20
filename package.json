@@ -1,0 +1,26 @@
+{
+  "name": "MAX17048",
+  "description": "MAX17048",
+  "description_zh": "MAX17048",  
+  "keywords": [
+    "MAX17048"
+  ],
+  "category": "peripherals",
+  "author": {
+    "name": "zpw",
+    "email": "aeo1234@qq.com"
+  },
+  "license": "GPL-2.0",
+  "repository": "https://gitee.com/aeo123/ledblink.git",
+  "icon": "unknown",
+  "homepage": "https://gitee.com/aeo123/ledblink/tree/master",
+  "doc": "https://gitee.com/aeo123/ledblink/blob/master/readme.md",
+  "site": [
+    {
+      "version": "latest",
+      "URL": "https://gitee.com/aeo123/ledblink.git",
+      "filename": "Null for git package",
+      "VER_SHA": "master"
+    }
+  ]
+}
