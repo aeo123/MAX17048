@@ -1,6 +1,8 @@
 #include "MAX17048.h"
 
-#define MAX17048_ADDRESS (0x6C >> 1)
+#define MAX17048_ADDRESS (0x6C)
+
+//#define MAX17048_ADDRESS (0x6C >> 1)
 
 static MAX_Ops max_ops;
 
