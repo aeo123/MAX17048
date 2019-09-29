@@ -1,15 +1,42 @@
 #include "MAX17048.h"
 
-#define MAX17048_ADDRESS (0x6C)
+#define MAX17048_ADDRESS_HARD (0x6C)
+#define MAX17048_ADDRESS_SOFT (0x6C >> 1)
 
-//#define MAX17048_ADDRESS (0x6C >> 1)
+#define MAX17048_ADDRESS MAX17048_ADDRESS_HARD
 
-static MAX_Ops max_ops;
+static rt_device_t i2c_dev = RT_NULL;
 
-void max17048_init(Ops_With_Addr read_ops, Ops_With_Addr write_ops)
+//使用了DMA了可以访问的内存
+static __attribute__((section(".RAM_D1"))) uint8_t memoryRead[3];
+static __attribute__((section(".RAM_D1"))) uint8_t memoryWrite[3];
+
+static uint8_t read_with_address(uint8_t addr, uint8_t *buf, uint8_t len)
 {
-    max_ops.ReadWithAddr = read_ops;
-    max_ops.WriteWithAddr = write_ops;
+    int ret = 0;
+    ret = rt_device_read(i2c_dev, addr, buf, len);
+    return ret;
+}
+static uint8_t write_with_address(uint8_t addr, uint8_t *buf, uint8_t len)
+{
+    int ret = 0;
+    ret = rt_device_write(i2c_dev, addr, buf, len);
+    return ret;
+}
+
+void max17048_init(const char *bus_name)
+{
+    i2c_dev = rt_device_find(bus_name);
+    if (i2c_dev == RT_NULL)
+    {
+        rt_kprintf("max17048 i2c bus can not be find");
+    }
+    if (rt_device_open(i2c_dev, RT_DEVICE_FLAG_RDWR) != RT_EOK)
+    {
+        rt_kprintf("max17048 i2c bus open failed");
+        return;
+    }
+    rt_thread_delay(20);
 }
 
 /**
@@ -19,12 +46,12 @@ void max17048_init(Ops_With_Addr read_ops, Ops_With_Addr write_ops)
  */
 uint8_t max17048_get_permille(float *per)
 {
-    uint8_t memoryRead[3];
-    uint8_t cmd = REGISTER_SOC;
-
-    if (max_ops.WriteWithAddr(MAX17048_ADDRESS, &cmd, 1) != 1)
+    
+		memoryWrite[0] = REGISTER_SOC;
+	
+    if (write_with_address(MAX17048_ADDRESS, memoryWrite, 1) != 1)
         return 0;
-    if (max_ops.ReadWithAddr(MAX17048_ADDRESS, memoryRead, 2) != 2)
+    if (read_with_address(MAX17048_ADDRESS, memoryRead, 2) != 2)
         return 0;
 
     uint16_t value = ((uint16_t)memoryRead[0] << 8) | memoryRead[1];
@@ -45,13 +72,13 @@ uint8_t max17048_get_permille(float *per)
  */
 uint8_t max17048_get_millivolt(float *volt)
 {
-    uint8_t memoryRead[3];
 
-    uint8_t cmd = REGISTER_VCELL;
 
-    if (max_ops.WriteWithAddr(MAX17048_ADDRESS, &cmd, 1) != 1)
+		memoryWrite[0] = REGISTER_VCELL;
+	
+    if (write_with_address(MAX17048_ADDRESS, memoryWrite, 1) != 1)
         return 0;
-    if (max_ops.ReadWithAddr(MAX17048_ADDRESS, memoryRead, 2) != 2)
+    if (read_with_address(MAX17048_ADDRESS, memoryRead, 2) != 2)
         return 0;
 
     uint16_t value = ((uint16_t)memoryRead[0] << 8) | memoryRead[1];
@@ -112,13 +139,13 @@ uint8_t max17048_get_status(uint16_t *val)
  */
 uint8_t max_setRegister(max_register_t reg, uint16_t value)
 {
-    uint8_t memoryWrite[3];
+  
 
     memoryWrite[0] = reg;
     memoryWrite[1] = value >> 8;
     memoryWrite[2] = value;
 
-    if (max_ops.WriteWithAddr(MAX17048_ADDRESS, memoryWrite, 3) != 3)
+    if (write_with_address(MAX17048_ADDRESS, memoryWrite, 3) != 3)
         return 0;
 
     return 1;
@@ -126,11 +153,12 @@ uint8_t max_setRegister(max_register_t reg, uint16_t value)
 
 uint8_t max_getRegister(max_register_t reg, uint16_t *value)
 {
-    uint8_t memoryRead[3];
 
-    if (max_ops.WriteWithAddr(MAX17048_ADDRESS, &reg, 1) != 1)
+		memoryWrite[0] = reg;
+	
+    if (write_with_address(MAX17048_ADDRESS, memoryWrite, 1) != 1)
         return 0;
-    if (max_ops.ReadWithAddr(MAX17048_ADDRESS, memoryRead, 2) != 2)
+    if (read_with_address(MAX17048_ADDRESS, memoryRead, 2) != 2)
         return 0;
 
     *value = ((uint16_t)memoryRead[0] << 8) | memoryRead[1];
